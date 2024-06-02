@@ -3,6 +3,7 @@ package org.main;
 import org.main.entity.Entity;
 import org.main.entity.Food;
 import org.main.entity.Mite;
+import org.main.entity.Spider;
 
 import javax.swing.JPanel;
 import java.awt.Color;
@@ -17,7 +18,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class SimulationPanel extends JPanel implements Runnable {
     // A bunch of variables that control the panel
     private final int originalTileSize = 3;
-    private final int scale = 2;
+    private final int scale = 3;
     private final int tileSize = originalTileSize * scale;
     private final int maxCol = 64;
     private final int maxRow = 48;
@@ -101,6 +102,8 @@ public class SimulationPanel extends JPanel implements Runnable {
                 g.setColor(new Color(255, 253, 208));
             } else if (e.getClass() == Food.class) {
                 g.setColor(new Color(150, 75, 0));
+            } else if (e.getClass() == Spider.class) {
+                g.setColor(new Color(72, 50, 72));
             }
             g.fillRect(e.x * tileSize, e.y * tileSize, tileSize, tileSize);
         }
@@ -110,7 +113,7 @@ public class SimulationPanel extends JPanel implements Runnable {
 
    // Check if coordinates breach containment
     public boolean breaches(int x, int y) {
-        return !(x < 0 || y < 0 || x > maxCol || y > maxRow);
+        return !(x <= 0 || y <= 0 || x >= maxCol || y >= maxRow);
     }
 
     public void pauseSimulation() {
@@ -136,9 +139,10 @@ public class SimulationPanel extends JPanel implements Runnable {
         int entityRandomizer = random.nextInt(100);
         if (entityRandomizer < 66) {
             entities.add(new Mite(x, y, this));
-        } else if (entityRandomizer > 67 && entityRandomizer < 100) {
+        } else if (entityRandomizer > 67 && entityRandomizer < 95) {
             entities.add(new Food(x, y, this));
         } else {
+            entities.add(new Spider(x, y, this));
         }
     }
 

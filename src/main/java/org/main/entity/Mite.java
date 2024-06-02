@@ -5,7 +5,7 @@ import org.main.SimulationPanel;
 import java.util.Random;
 
 public class Mite extends Crawlie {
-    public static int startingLife = 5;
+    public static int startingLife = 1;
     public static int delay = 20;
     public int delayLeft = delay;
 
@@ -16,6 +16,11 @@ public class Mite extends Crawlie {
     public void update() {
         Random random = new Random();
         lock.lock();
+
+        if (life == 0) {
+            killme = true;
+            return;
+        }
 
         // Check if Food on path
         Entity foodOnPath = sp.entities.stream()
