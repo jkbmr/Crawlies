@@ -1,10 +1,6 @@
 package org.main;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.*;
 
 public class Main {
     public static void main(String[] args) {
@@ -17,6 +13,9 @@ public class Main {
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.X_AXIS));
 
         SimulationPanel simulationPanel = new SimulationPanel();
+
+        JPanel sidePanel = new JPanel();
+        sidePanel.setLayout(new BoxLayout(sidePanel, BoxLayout.Y_AXIS));
 
         JPanel buttons = new JPanel();
         buttons.setLayout(new BoxLayout(buttons, BoxLayout.Y_AXIS));
@@ -36,9 +35,16 @@ public class Main {
         buttons.add(buttonReset);
         buttons.add(Box.createVerticalStrut(10));
 
+        JButton buttonPrint = new JButton("Print");
+        buttonPrint.addActionListener(e -> simulationPanel.printInfo());
+        buttons.add(buttonPrint);
+        buttons.add(Box.createVerticalStrut(10));
+
+        sidePanel.add(buttons);
+
         mainPanel.add(simulationPanel);
         mainPanel.add(Box.createHorizontalStrut(10));
-        mainPanel.add(buttons);
+        mainPanel.add(sidePanel);
 
         window.add(mainPanel);
         window.pack();

@@ -14,17 +14,17 @@ public class Mite extends Crawlie {
     }
 
     public void update() {
-        Random random = new Random();
-        lock.lock();
-
-        if (life == 0) {
+        if (life <= 0) {
             killme = true;
             return;
         }
 
+        Random random = new Random();
+        lock.lock();
+
         // Check if Food on path
         Entity foodOnPath = sp.entities.stream()
-                .filter(e -> e.getClass() == Food.class)
+                .filter(e -> e instanceof Food)
                 .filter(e -> e.x == x)
                 .filter(e -> e.y == y)
                 .findFirst().orElse(null);
@@ -33,6 +33,7 @@ public class Mite extends Crawlie {
         if (foodOnPath != null) {
             try {
                 sp.remove(foodOnPath);
+                life++;
             } finally {
                 lock.unlock();
             }
