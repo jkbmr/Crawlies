@@ -13,8 +13,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * Panel symulacji, który zarządza logiką i wyświetlaniem elementów symulacji.
+ */
 public class SimulationPanel extends JPanel implements Runnable {
-    // A bunch of variables that control the panel
+    // Zmienne kontrolujące panel
     private final int originalTileSize = 3;
     private final int scale = 3;
     private final int tileSize = originalTileSize * scale;
@@ -33,12 +36,19 @@ public class SimulationPanel extends JPanel implements Runnable {
     public ArrayList<Scolopendra> scolopendras = new ArrayList<>();
     public ConcurrentLinkedQueue<Entity> entityQueue = new ConcurrentLinkedQueue<>();
     public ConcurrentLinkedQueue<Entity> deletionQueue = new ConcurrentLinkedQueue<>();
+
+    /**
+     * Konstruktor klasy SimulationPanel.
+     */
     public SimulationPanel() {
         this.setPreferredSize(new Dimension(panelWidth, panelHeight));
         this.setBackground(Color.black);
         this.setDoubleBuffered(true);
     }
 
+    /**
+     * Uruchamia wątek symulacji.
+     */
     public void startThread() {
         thread = new Thread(this);
         thread.start();
@@ -46,7 +56,7 @@ public class SimulationPanel extends JPanel implements Runnable {
 
     @Override
     public void run() {
-        // Don't run if paused
+        // Nie uruchamiaj, jeśli symulacja jest wstrzymana
         while (running & thread != null) {
             synchronized (lock) {
                 if (!running) { break; }
@@ -61,7 +71,7 @@ public class SimulationPanel extends JPanel implements Runnable {
                 }
             }
 
-            // Timeframe limit
+            // Ograniczenie ramki czasowej
             double interval = 20000000;
             double delta = 0;
             long timeLast = System.nanoTime();
@@ -81,12 +91,14 @@ public class SimulationPanel extends JPanel implements Runnable {
         }
     }
 
-    // Update function
+    /**
+     * Funkcja aktualizująca stan symulacji.
+     */
     public void update() {
         scolopendras.forEach(e -> e.update());
         scolopendras.removeAll(scolopendras.stream().filter(e -> e.life <= 0).toList());
         for (Entity e: entities) {
-            // Add entity to deletion queue if killflag, else update
+            // Dodaj obiekt do kolejki usunięcia, jeśli ma ustawioną flagę kill, w przeciwnym razie aktualizuj
             if (e.killme) {
                 deletionQueue.add(e);
             } else {
@@ -103,7 +115,10 @@ public class SimulationPanel extends JPanel implements Runnable {
         }
     }
 
-    // Make the components show up
+    /**
+     * Funkcja rysująca komponenty.
+     * @param g Obiekt Graphics używany do rysowania.
+     */
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
@@ -128,21 +143,32 @@ public class SimulationPanel extends JPanel implements Runnable {
                 }
             }
         } catch (ConcurrentModificationException ex) {
-            // We can ignore this, because the loop will be redone anyway
+            // Możemy to zignorować, ponieważ pętla zostanie i tak wykonana ponownie
         }
 
         g.dispose();
     }
 
-   // For checking if coordinates breach containment
+    /**
+     * Sprawdza, czy współrzędne wykraczają poza obszar symulacji.
+     * @param x Współrzędna x.
+     * @param y Współrzędna y.
+     * @return True, jeśli współrzędne wykraczają poza obszar, w przeciwnym razie false.
+     */
     public boolean breaches(int x, int y) {
         return !(x <= 0 || y <= 0 || x >= maxCol || y >= maxRow);
     }
 
+    /**
+     * Wstrzymuje symulację.
+     */
     public void pauseSimulation() {
         paused = true;
     }
 
+    /**
+     * Wznawia symulację.
+     */
     public void unpauseSimulation() {
         synchronized (lock) {
             paused = false;
@@ -150,7 +176,9 @@ public class SimulationPanel extends JPanel implements Runnable {
         }
     }
 
-    // Clear all collections
+    /**
+     * Resetuje stan symulacji, czyszcząc wszystkie kolekcje.
+     */
     public void resetSimulation() {
         running = false;
         delayLeft = 0;
@@ -162,6 +190,9 @@ public class SimulationPanel extends JPanel implements Runnable {
         unpauseSimulation();
     }
 
+    /**
+     * Wypisuje informacje o liczbie poszczególnych typów obiektów w symulacji.
+     */
     public void printInfo() {
         System.out.println("Mites: " + entities.stream().filter(e -> e instanceof Mite).count());
         System.out.println("Beetles: " + entities.stream().filter(e -> e instanceof Beetle).count());
@@ -171,6 +202,9 @@ public class SimulationPanel extends JPanel implements Runnable {
         System.out.println("*********************");
     }
 
+    /**
+     * Funkcja generująca nowe obiekty w symulacji.
+     */
     private void spawn() {
         Random random = new Random();
 
@@ -184,7 +218,7 @@ public class SimulationPanel extends JPanel implements Runnable {
         } else if (entityRandomizer <= 140) {
             entities.add(new Beetle(x, y, this));
         } else if ((entityRandomizer <= 160 || scolopendras.size() > 2)
-            && entities.stream().filter(e -> e instanceof Spider).count() < 10) {
+                && entities.stream().filter(e -> e instanceof Spider).count() < 10) {
             entities.add(new Spider(x, y, this));
         } else {
             Scolopendra scolopendra = new Scolopendra(x, y, this);
@@ -192,6 +226,10 @@ public class SimulationPanel extends JPanel implements Runnable {
         }
     }
 
+    /**
+     * Usuwa obiekt z symulacji, ustawiając flagę kill.
+     * @param e Obiekt do usunięcia.
+     */
     public void remove(Entity e) {
         e.killme = true;
     }

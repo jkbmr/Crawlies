@@ -6,16 +6,29 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * Klasa Beetle reprezentuje żuka w symulacji.
+ */
 public class Beetle extends Crawlie {
     public static int startingLife = 3;
     public static int delay = 15;
     public int delayLeft = delay;
     private Timer respawnTimer = new Timer();
 
+    /**
+     * Konstruktor klasy Beetle.
+     *
+     * @param x Współrzędna x początkowej pozycji żuka.
+     * @param y Współrzędna y początkowej pozycji żuka.
+     * @param sp Obiekt SimulationPanel, w którym żuk jest symulowany.
+     */
     public Beetle(int x, int y, SimulationPanel sp) {
         super(x, y, sp);
     }
 
+    /**
+     * Aktualizuje stan żuka w symulacji.
+     */
     @Override
     public void update() {
         if (life <= 0) {
@@ -26,14 +39,12 @@ public class Beetle extends Crawlie {
         Random random = new Random();
         lock.lock();
 
-        // Find food on path
         Entity foodOnPath = sp.entities.stream()
                 .filter(e -> e instanceof Food)
                 .filter(e -> e.x == x)
                 .filter(e -> e.y == y)
                 .findFirst().orElse(null);
 
-        // If food on path, remove and move to a new spot
         if (foodOnPath != null) {
             sp.remove(foodOnPath);
             respawnTimer.schedule(new TimerTask() {
@@ -48,8 +59,6 @@ public class Beetle extends Crawlie {
             }, 3000);
         }
 
-
-        // If no destination, walk in a random direction
         if ((xDest < 0 || yDest < 0)) {
             do {
                 xDest = x + 20 * (random.nextInt(3) - 1);

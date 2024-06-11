@@ -2,7 +2,15 @@ package org.main;
 
 import javax.swing.*;
 
+/**
+ * Główna klasa aplikacji, która inicjalizuje i uruchamia interfejs graficzny.
+ */
 public class Main {
+    /**
+     * Metoda główna aplikacji.
+     *
+     * @param args Argumenty wiersza poleceń.
+     */
     public static void main(String[] args) {
         JFrame window = new JFrame();
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
