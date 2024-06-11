@@ -26,12 +26,14 @@ public class Beetle extends Crawlie {
         Random random = new Random();
         lock.lock();
 
+        // Find food on path
         Entity foodOnPath = sp.entities.stream()
                 .filter(e -> e instanceof Food)
                 .filter(e -> e.x == x)
                 .filter(e -> e.y == y)
                 .findFirst().orElse(null);
 
+        // If food on path, remove and move to a new spot
         if (foodOnPath != null) {
             sp.remove(foodOnPath);
             respawnTimer.schedule(new TimerTask() {
@@ -47,6 +49,7 @@ public class Beetle extends Crawlie {
         }
 
 
+        // If no destination, walk in a random direction
         if ((xDest < 0 || yDest < 0)) {
             do {
                 xDest = x + 20 * (random.nextInt(3) - 1);
